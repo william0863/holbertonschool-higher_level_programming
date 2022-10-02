@@ -1,4 +1,4 @@
-# Python - Classes and Objects
+# Python - Inheritance
 
 ## Learning Objectives
 ### General
