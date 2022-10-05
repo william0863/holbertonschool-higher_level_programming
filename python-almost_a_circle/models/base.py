@@ -8,81 +8,104 @@ Returns Python obj of JSON string representation
 Returns instance with attributes already set
 Returns list of instances
 """
-
-
 import json
 
 
-class Base():
-    """
-    defines class Base
-    Class Attributes:
-        __nb_objects
-    Methods:
-        __init__(self, id=None)
-    Static Methods:
-        to_json_string(list_dictionaries)
-        from_json_string(json_string)
-    Class Methods:
-        save_to_file(cls, list_objs)
-        create(cls, **dictionary)
-        load_from_file(cls)
+class Base:
+    """ base class
+    Attributes:
+        _nb_objects: number of objects created
+        id: id of object
     """
     __nb_objects = 0
 
     def __init__(self, id=None):
-        """Initialize id, increment class attribute if no id and set as id"""
-        if id:
+        """initiation method
+        args:
+            id: id of object
+        """
+        if id is not None:
             self.id = id
         else:
             Base.__nb_objects += 1
-            self.id = self.__nb_objects
+            self.id = Base.__nb_objects
+
+    def integer_validator(self, name, value):
+        """check if value is an integer"""
+        if type(value) is not int:
+            raise TypeError('{} must be an integer'.format(name))
+        if value <= 0:
+            raise ValueError('{} must be > 0'.format(name))
+
+    def integer_validator2(self, name, value):
+        """check if value is an integer"""
+        if type(value) is not int:
+            raise TypeError('{} must be an integer'.format(name))
+        if value < 0:
+            raise ValueError('{} must be >= 0'.format(name))
 
     @staticmethod
     def to_json_string(list_dictionaries):
-        """Returns JSON string representation of list dict"""
-        if list_dictionaries is None:
-            list_dictionaries = []
-        return json.dumps(list_dictionaries)
+        """returns JSON string
+        args:
+            list_dictionaries: list of dictionaries
+        return:
+            return serialized list or empty list
+        """
+        return json.dumps(list_dictionaries or [])
 
     @staticmethod
     def from_json_string(json_string):
-        """Returns Python obj of JSON string representation"""
-        if json_string is None or len(json_string) == 0:
-            json_string = "[]"
-        return json.loads(json_string)
+        """json to string static method
+        args:
+            json_string: json object string type
+        return:
+            list of json strings
+        """
+        if json_string:
+            return json.loads(json_string)
+        return []
 
     @classmethod
     def save_to_file(cls, list_objs):
-        """Save json strings of all instances into file"""
-        objs = []
-        if list_objs is not None:
-            for o in list_objs:
-                objs.append(cls.to_dictionary(o))
-        filename = cls.__name__ + ".json"
-        with open(filename, "w") as f:
-            f.write(cls.to_json_string(objs))
+        """writes JSON string to a file
+        args:
+            list_objs: list of objects
+        return:
+            na
+        """
+        if list_objs:
+            j = cls.to_json_string([obj.to_dictionary() for obj in list_objs])
+        else:
+            j = '[]'
+        with open(cls.__name__ + '.json', 'w') as f:
+            f.write(j)
 
     @classmethod
     def create(cls, **dictionary):
-        """Returns instance with attributes already set"""
-        if cls.__name__ == "Square":
-            dummy = cls(1)
+        """return instance with all attributes set
+        args:
+            dictionary: double pointer
+        return:
+            instance with set attribute
+        """
         if cls.__name__ == "Rectangle":
             dummy = cls(1, 1)
+        if cls.__name__ == "Square":
+            dummy = cls(1)
         dummy.update(**dictionary)
         return dummy
 
     @classmethod
     def load_from_file(cls):
-        """Returns list of instances"""
-        filenamee = cls.__name__ + ".json"
-        l = []
+        '''Returns a list of instances
+        return:
+            list of instance json string
+        '''
         try:
-            with open(filenamee, "r") as f:
-                instances = cls.from_json_string(f.read())
-            for i, dic in enumerate(instances):
-                l.append(cls.create(**instances[i]))
-        except:
-            pass
-        return l
+            filename = cls.__name__ + '.json'
+            with open(filename, mode='r') as f:
+                d = cls.from_json_string(f.read())
+            return [cls.create(**x) for x in d]
+        except FileNotFoundError:
+            return []
