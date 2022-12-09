@@ -1,5 +1,5 @@
 # JavaScript - Objects, Scopes and Closures
-![](https://s3.eu-west-3.amazonaws.com/hbtn.intranet.project.files/holbertonschool-higher-level_programming+/303/Javascript-535.png.jpeg)
+![](https://www.internet-marketeux.fr/wp-content/uploads/2021/03/Javascripts-reduction-et-minification.png)
 
 ## Learning Objectives
 ### General
